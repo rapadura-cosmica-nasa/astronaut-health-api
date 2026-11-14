@@ -24,6 +24,7 @@ public class TelemetryRecord {
     private double radiationDoseMsv;
     private double sleepHours;
     private String riskLevel;
+    private String recommendedAction;
 
     @Column(length = 500)
     private String alertMessage;
