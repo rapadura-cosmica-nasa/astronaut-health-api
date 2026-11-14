@@ -1,6 +1,6 @@
 # 🚀 Astronaut Health API — Core API & Persistência
 
-> **Organização:** [Rapadura Cósmica](https://github.com/Rapadura-Cosmica) — NASA Space Apps Challenge 2026 (Campina Grande, PB)  
+> **Organização:** [Rapadura Cósmica](https://github.com/rapadura-cosmica-nasa) — NASA Space Apps Challenge 2026 (Campina Grande, PB)  
 > **Stack:** Java 17+, Spring Boot 3, Spring Web, Spring Data JPA, H2 Database  
 > **Responsáveis:** Mateus Queiroz & Grimaldo Júnior
 
@@ -8,15 +8,15 @@
 
 ## 📋 Visão Geral
 
-O **`astronaut-health-api`** é o núcleo orquestrador e de persistência da arquitetura do sistema de monitoramento de saúde de astronautas. Ele atua como o *gateway* central entre a camada de borda (Hardware/Simulador), o motor de inteligência clínica (**`telemetry-analytics`** em Python/Flask) e o painel operacional da tripulação (**`mission-control-ui`**).
+O **`astronaut-health-api`** é o núcleo orquestrador e de persistência da arquitetura do sistema de monitoramento de saúde de astronautas. Ele atua como o *gateway* central entre a camada de borda (Simulador/Hardware), o motor de inteligência clínica e protocolos (**`telemetry-analytics`** em Python/Flask) e o painel operacional da tripulação (**`mission-control-ui`**).
 
 ### Responsabilidades no Ecossistema (MVP)
-1. **Ingestão de Telemetria:** Receber os dados biométricos brutos enviados pelo hardware ou simulador (`POST /api/telemetry`).
-2. **Orquestração Clínica:** Encaminhar o payload recebido via HTTP para o microsserviço de análise em Python (`POST /api/v1/analyze`) para validação e triagem de risco.
-3. **Persistência & Histórico:** Salvar o registro biométrico já enriquecido (`riskLevel` e `alertMessage`) no banco de dados **H2**.
+1. **Ingestão de Telemetria:** Receber os dados biométricos brutos enviados pelo simulador ou hardware (`POST /api/telemetry`).
+2. **Orquestração Clínica:** Encaminhar o payload recebido via HTTP para o microsserviço de análise em Python (`POST /api/v1/analyze`) para validação, triagem de risco e geração de protocolo operacional.
+3. **Persistência & Histórico:** Salvar o registro biométrico já enriquecido (`riskLevel`, `alertMessage` e `recommendedAction`) no banco de dados **H2**.
 4. **Exposição para o Painel:** Disponibilizar a leitura mais recente e o histórico clínico para o Front-end via REST (`GET /api/telemetry/latest`), com CORS devidamente habilitado.
 
-> **Nota de Escopo (MVP):** Para garantir máxima velocidade de entrega e estabilidade durante o hackathon, esta API utiliza **H2 Database** (sem dependência de bancos externos ou autenticação JWT nesta fase) e delega 100% do cálculo de severidade clínica ao serviço Python (`telemetry-analytics`).
+> **Nota de Escopo (MVP):** Para garantir máxima velocidade de entrega e estabilidade durante o hackathon, esta API utiliza **H2 Database** (sem dependência de bancos externos ou autenticação JWT nesta fase) e delega 100% do cálculo de severidade clínica e diretrizes de ação ao serviço Python (`telemetry-analytics`).
 
 ---
 
@@ -35,7 +35,7 @@ sequenceDiagram
     JavaAPI->>PythonAPI: POST /api/v1/analyze (Forward payload)
     
     alt Análise Python OK (200)
-        PythonAPI-->>JavaAPI: JSON enriquecido (riskLevel + alertMessage)
+        PythonAPI-->>JavaAPI: JSON enriquecido (riskLevel + alertMessage + recommendedAction)
     else Falha de Rede / Timeout Python
         JavaAPI->>JavaAPI: Aplica fallback seguro (riskLevel: "UNKNOWN")
     end
@@ -78,7 +78,7 @@ src/main/java/com/rapaduracosmica/astronauthealth/
 ## 🔌 Contrato de Integração (API Endpoints)
 
 ### 1. Ingestão de Telemetria (`POST /api/telemetry`)
-Recebe os dados do simulador/ESP32, envia ao Python para classificação e salva no H2.
+Recebe os dados do simulador/hardware, envia ao Python para classificação e salva no H2.
 
 * **Request Body (JSON):**
 ```json
@@ -103,7 +103,8 @@ Recebe os dados do simulador/ESP32, envia ao Python para classificação e salva
   "radiationDoseMsv": 0.4,
   "sleepHours": 7.2,
   "riskLevel": "WARNING",
-  "alertMessage": "Frequência cardíaca elevada/baixa detectada. Recomenda-se hidratação e repouso."
+  "alertMessage": "Frequência cardíaca elevada/baixa detectada.",
+  "recommendedAction": "Reduzir carga física, reforçar hidratação e reavaliar sinais vitais em 15 minutos."
 }
 ```
 
@@ -158,7 +159,7 @@ spring:
 ### Passos
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/Rapadura-Cosmica/astronaut-health-api.git
+git clone https://github.com/rapadura-cosmica-nasa/astronaut-health-api.git
 cd astronaut-health-api
 
 # 2. Compilar e rodar a aplicação
@@ -173,9 +174,9 @@ cd astronaut-health-api
 ## 📅 Checklist de Entrega (MVP)
 
 - [ ] Criar projeto Spring Boot (`Spring Web`, `Spring Data JPA`, `H2 Database`, `Validation`)
-- [ ] Implementar `TelemetryDTO` respeitando exatamente os nomes em `camelCase` do contrato
+- [ ] Implementar `TelemetryDTO` e `TelemetryRecord` respeitando exatamente os nomes em `camelCase` do contrato (incluindo `recommendedAction`)
 - [ ] Implementar `AnalyticsClient` apontando para `http://localhost:5000/api/v1/analyze` com tratamento de fallback caso o Python esteja offline
-- [ ] Criar `TelemetryRecord` e `TelemetryRepository`
+- [ ] Criar `TelemetryRepository` e `TelemetryService`
 - [ ] Expor `POST /api/telemetry` e `GET /api/telemetry/latest`
 - [ ] Configurar CORS global (`*`) para evitar bloqueio no `mission-control-ui`
 - [ ] Validar integração ponta a ponta com `telemetry-analytics` e `mission-control-ui`
