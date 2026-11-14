@@ -118,23 +118,32 @@ Retorna a lista de registros armazenados (útil para gráficos de evolução no 
 
 ---
 
-## ⚙️ Configuração (`application.properties`)
+## ⚙️ Configuração (`application.yaml`)
 
-```properties
-server.port=8080
+```yaml
+spring:
+  application:
+    name: astronauthealthapi
 
-# H2 Database (Em memória + Console Web ativo)
-spring.datasource.url=jdbc:h2:mem:astronautdb;DB_CLOSE_DELAY=-1
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=update
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
+  # Configuração da Base de Dados H2 em memória
+  datasource:
+    url: jdbc:h2:mem:astronautdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
 
-# URL do Microsserviço Python (telemetry-analytics)
-analytics.service.url=http://localhost:5000/api/v1/analyze
+  # Configurações do Hibernate / JPA
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # Habilitar o Console Web do H2
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 ```
 
 ---
