@@ -11,8 +11,8 @@ public class TelemetryAnalysisDTO {
     private double sleepHours;
     private String riskLevel;
     private String alertMessage;
+    private String recommendedAction;
 
-    // Getters e Setters dos campos originais
     public String getAstronautId() { return astronautId; }
     public void setAstronautId(String astronautId) { this.astronautId = astronautId; }
 
@@ -31,10 +31,12 @@ public class TelemetryAnalysisDTO {
     public double getSleepHours() { return sleepHours; }
     public void setSleepHours(double sleepHours) { this.sleepHours = sleepHours; }
 
-    // Getters e Setters exigidos para o AnalyticsClient
     public String getRiskLevel() { return riskLevel; }
     public void setRiskLevel(String riskLevel) { this.riskLevel = riskLevel; }
 
     public String getAlertMessage() { return alertMessage; }
     public void setAlertMessage(String alertMessage) { this.alertMessage = alertMessage; }
+
+    public String getRecommendedAction() { return recommendedAction; }
+    public void setRecommendedAction(String recommendedAction) { this.recommendedAction = recommendedAction; }
 }

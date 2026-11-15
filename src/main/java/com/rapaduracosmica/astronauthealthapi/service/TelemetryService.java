@@ -1,6 +1,6 @@
 package com.rapaduracosmica.astronauthealthapi.service;
 
-import com.rapaduracosmica.astronauthealthapi.client.AnalyticsClient; // 1. Importa o Client
+import com.rapaduracosmica.astronauthealthapi.client.AnalyticsClient; 
 import com.rapaduracosmica.astronauthealthapi.dto.TelemetryAnalysisDTO;
 import com.rapaduracosmica.astronauthealthapi.model.TelemetryRecord;
 import com.rapaduracosmica.astronauthealthapi.repository.TelemetryRepository;
@@ -14,7 +14,7 @@ import java.util.List;
 public class TelemetryService {
 
     private final TelemetryRepository repository;
-    private final AnalyticsClient analyticsClient; // 2. Injeta o AnalyticsClient aqui
+    private final AnalyticsClient analyticsClient; 
 
     public TelemetryRecord saveTelemetry(TelemetryRecord record){
         return repository.save(record);
@@ -27,12 +27,10 @@ public class TelemetryService {
         return repository.findTopByOrderByIdDesc().orElse(null);
     }
 
-    // 3. Orquestra: Recebe os dados, manda pro Python analisar e salva no H2
     public TelemetryRecord processAndSaveTelemetry(TelemetryAnalysisDTO inputDto) {
-        // 3. Usa o analyticsClient injetado para mandar os dados para o Python
+        
         TelemetryAnalysisDTO analyzedDto = analyticsClient.analyzeTelemetry(inputDto);
-
-        // Converte para a entidade do banco de dados
+        
         TelemetryRecord record = new TelemetryRecord();
         record.setAstronautId(analyzedDto.getAstronautId());
         record.setTimestamp(analyzedDto.getTimestamp());
@@ -40,14 +38,15 @@ public class TelemetryService {
         record.setSpo2(analyzedDto.getSpo2());
         record.setRadiationDoseMsv(analyzedDto.getRadiationDoseMsv());
         record.setSleepHours(analyzedDto.getSleepHours());
-        record.setRiskLevel(analyzedDto.getRiskLevel());         // Veio do Python
-        record.setAlertMessage(analyzedDto.getAlertMessage());   // Veio do Python
+        record.setRiskLevel(analyzedDto.getRiskLevel());         
+        record.setAlertMessage(analyzedDto.getAlertMessage());   
+        record.setRiskLevel(analyzedDto.getRiskLevel());
+        record.setAlertMessage(analyzedDto.getAlertMessage());
+        record.setRecommendedAction(analyzedDto.getRecommendedAction());
 
-        // Salva no H2
         return repository.save(record);
     }
 
-    // 4. Retorna a lista completa de histórico para os gráficos
     public List<TelemetryRecord> getAllTelemetry() {
         return repository.findAll();
     }
