@@ -1,5 +1,6 @@
 package com.rapaduracosmica.astronauthealthapi.controller;
 
+import com.rapaduracosmica.astronauthealthapi.dto.TelemetryAnalysisDTO;
 import com.rapaduracosmica.astronauthealthapi.model.TelemetryRecord;
 import com.rapaduracosmica.astronauthealthapi.service.TelemetryService;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/telemetry")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class TelemetryController {
     private final TelemetryService service;
 
     @PostMapping
-    public ResponseEntity<TelemetryRecord> createTelemetry(@RequestBody TelemetryRecord record){
-        TelemetryRecord savedRecord = service.saveTelemetry(record);
+    public ResponseEntity<TelemetryRecord> createTelemetry(@RequestBody TelemetryAnalysisDTO dto) {
+        TelemetryRecord savedRecord = service.processAndSaveTelemetry(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRecord);
     }
 
