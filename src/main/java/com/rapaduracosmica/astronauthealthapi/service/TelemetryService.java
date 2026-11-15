@@ -40,8 +40,6 @@ public class TelemetryService {
         record.setSleepHours(analyzedDto.getSleepHours());
         record.setRiskLevel(analyzedDto.getRiskLevel());         
         record.setAlertMessage(analyzedDto.getAlertMessage());   
-        record.setRiskLevel(analyzedDto.getRiskLevel());
-        record.setAlertMessage(analyzedDto.getAlertMessage());
         record.setRecommendedAction(analyzedDto.getRecommendedAction());
 
         return repository.save(record);
